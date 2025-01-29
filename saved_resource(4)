@@ -1,0 +1,387 @@
+( function ( g ) {
+
+  var t = {
+      PLATFORM_WINDOWS: 'windows',
+      PLATFORM_IPHONE: 'iphone',
+      PLATFORM_IPOD: 'ipod',
+      PLATFORM_IPAD: 'ipad',
+      PLATFORM_BLACKBERRY: 'blackberry',
+      PLATFORM_BLACKBERRY_10: 'blackberry_10',
+      PLATFORM_SYMBIAN: 'symbian_series60',
+      PLATFORM_SYMBIAN_S40: 'symbian_series40',
+      PLATFORM_J2ME_MIDP: 'j2me_midp',
+      PLATFORM_ANDROID: 'android',
+      PLATFORM_ANDROID_TABLET: 'android_tablet',
+      PLATFORM_FIREFOX_OS: 'firefoxOS',
+      PLATFORM_MOBILE_GENERIC: 'mobile_generic',
+
+      userAgent : false, // Shortcut to the browser User Agent String.
+      matchedPlatformName : false, // Matched platform name. False otherwise.
+      matchedUserAgentName : false, // Matched UA String. False otherwise.
+
+      init: function() {
+        try {
+          t.userAgent = g.navigator.userAgent.toLowerCase();
+          t.getPlatformName();
+          t.getMobileUserAgentName();
+        }	catch ( e ) {
+          console.error( e );
+        }
+      },
+
+      initForTest: function( userAgent ) {
+        t.matchedPlatformName = false;
+        t.matchedUserAgentName = false;
+        try {
+          t.userAgent = userAgent.toLowerCase();
+          t.getPlatformName();
+          t.getMobileUserAgentName();
+        }	catch ( e ) {
+          console.error( e );
+        }
+      },
+
+      /**
+       * This method detects the mobile User Agent name.
+       */
+      getMobileUserAgentName: function() {
+        if ( t.matchedUserAgentName !== false )
+          return t.matchedUserAgentName;
+
+        if ( t.userAgent === false )
+          return false;
+
+        if ( t.isChromeForIOS() )
+          t.matchedUserAgentName = 'chrome-for-ios';
+        else if ( t.isTwitterForIpad() )
+          t.matchedUserAgentName =  'twitter-for-ipad';
+        else if ( t.isTwitterForIphone() )
+          t.matchedUserAgentName =  'twitter-for-iphone';
+        else if ( t.isIPhoneOrIPod() )
+          t.matchedUserAgentName = 'iphone';
+        else if ( t.isIPad() )
+          t.matchedUserAgentName = 'ipad';
+        else if ( t.isAndroidTablet() )
+          t.matchedUserAgentName = 'android_tablet';
+        else if ( t.isAndroid() )
+          t.matchedUserAgentName = 'android';
+        else if ( t.isBlackberry10() )
+          t.matchedUserAgentName = 'blackberry_10';
+        else if ( has( 'blackberry' ) )
+          t.matchedUserAgentName = 'blackberry';
+        else if ( t.isBlackberryTablet() )
+          t.matchedUserAgentName = 'blackberry_tablet';
+        else if ( t.isWindowsPhone7() )
+          t.matchedUserAgentName = 'win7';
+        else if ( t.isWindowsPhone8() )
+          t.matchedUserAgentName = 'winphone8';
+        else if ( t.isOperaMini() )
+          t.matchedUserAgentName = 'opera-mini';
+        else if ( t.isOperaMobile() )
+          t.matchedUserAgentName = 'opera-mobi';
+        else if ( t.isKindleFire() )
+          t.matchedUserAgentName = 'kindle-fire';
+        else if ( t.isSymbianPlatform() )
+          t.matchedUserAgentName = 'series60';
+        else if ( t.isFirefoxMobile() )
+          t.matchedUserAgentName = 'firefox_mobile';
+        else if ( t.isFirefoxOS() )
+          t.matchedUserAgentName = 'firefoxOS';
+        else if ( t.isFacebookForIphone() )
+          t.matchedUserAgentName = 'facebook-for-iphone';
+        else if ( t.isFacebookForIpad() )
+          t.matchedUserAgentName = 'facebook-for-ipad';
+        else if ( t.isWordPressForIos() )
+          t.matchedUserAgentName = 'ios-app';
+        else if ( has( 'iphone' ) )
+          t.matchedUserAgentName = 'iphone-unknown';
+        else if ( has( 'ipad' ) )
+          t.matchedUserAgentName = 'ipad-unknown';
+
+        return t.matchedUserAgentName;
+      },
+
+      /**
+       * This method detects the mobile platform name.
+       */
+      getPlatformName : function() {
+        if ( t.matchedPlatformName !== false )
+          return t.matchedPlatformName;
+
+        if ( t.userAgent === false )
+          return false;
+
+        if ( has( 'windows ce' ) || has( 'windows phone' ) ) {
+          t.matchedPlatformName = t.PLATFORM_WINDOWS;
+        } else if ( has( 'ipad' ) ) {
+          t.matchedPlatformName = t.PLATFORM_IPAD;
+        } else if ( has( 'ipod' ) ) {
+          t.matchedPlatformName = t.PLATFORM_IPOD;
+        } else if ( has( 'iphone' ) ) {
+          t.matchedPlatformName = t.PLATFORM_IPHONE;
+        } else if ( has( 'android' ) ) {
+          if ( t.isAndroidTablet() )
+            t.matchedPlatformName = t.PLATFORM_ANDROID_TABLET;
+          else
+            t.matchedPlatformName = t.PLATFORM_ANDROID;
+        } else if ( t.isKindleFire() ) {
+          t.matchedPlatformName = t.PLATFORM_ANDROID_TABLET;
+        } else if ( t.isBlackberry10() ) {
+          t.matchedPlatformName = t.PLATFORM_BLACKBERRY_10;
+        } else if ( has( 'blackberry' ) ) {
+          t.matchedPlatformName = t.PLATFORM_BLACKBERRY;
+        } else if ( t.isBlackberryTablet() ) {
+          t.matchedPlatformName = t.PLATFORM_BLACKBERRY;
+        } else if ( t.isSymbianPlatform() ) {
+          t.matchedPlatformName = t.PLATFORM_SYMBIAN;
+        } else if ( t.isSymbianS40Platform() ) {
+          t.matchedPlatformName = t.PLATFORM_SYMBIAN_S40;
+        } else if ( t.isJ2MEPlatform() ) {
+          t.matchedPlatformName = t.PLATFORM_J2ME_MIDP;
+        } else if ( t.isFirefoxOS() ) {
+          t.matchedPlatformName = t.PLATFORM_FIREFOX_OS;
+        } else if ( t.isFirefoxMobile() ) {
+          t.matchedPlatformName = t.PLATFORM_MOBILE_GENERIC;
+        }
+
+        return t.matchedPlatformName;
+      },
+
+
+      /**
+       * Detect the BlackBerry OS version.
+       *
+       * Note: This is for smartphones only. Does not work on BB tablets.
+       */
+      getBlackBerryOSVersion : check( function() {
+        if ( t.isBlackberry10() )
+          return '10';
+
+        if ( ! has( 'blackberry' ) )
+          return false;
+
+        var rv = -1; // Return value assumes failure.
+        var re;
+
+        if ( has( 'webkit' ) ) { // Detecting the BB OS version for devices running OS 6.0 or higher
+          re = /Version\/([\d\.]+)/i;
+        } else {
+          // BlackBerry devices <= 5.XX
+          re = /BlackBerry\w+\/([\d\.]+)/i;
+        }
+        if ( re.exec( t.userAgent ) != null )
+          rv =  RegExp.$1.toString();
+
+        return rv === -1 ? false : rv;
+      } ),
+
+      /**
+       * Detects if the current UA is iPhone Mobile Safari or another iPhone or iPod Touch Browser.
+       */
+      isIPhoneOrIPod : check( function() {
+        return has( 'safari' ) && ( has( 'iphone' ) || has( 'ipod' ) );
+      } ),
+
+      /**
+       * Detects if the current device is an iPad.
+       */
+      isIPad : check( function() {
+        return has( 'ipad' ) && has( 'safari' );
+      } ),
+
+
+      /**
+      *  Detects if the current UA is Chrome for iOS
+      */
+      isChromeForIOS : check( function() {
+        return t.isIPhoneOrIPod() && has( 'crios/' );
+      } ),
+
+      /**
+       * Detects if the current browser is the Native Android browser.
+       */
+      isAndroid : check( function() {
+        if ( has( 'android' ) ) {
+          return ! ( t.isOperaMini() || t.isOperaMobile() || t.isFirefoxMobile() );
+        }
+      } ),
+
+      /**
+       * Detects if the current browser is the Native Android Tablet browser.
+       */
+       isAndroidTablet : check( function() {
+        if ( has( 'android' ) && ! has( 'mobile' ) ) {
+          return ! ( t.isOperaMini() || t.isOperaMobile() || t.isFirefoxMobile() );
+        }
+      } ),
+
+
+      /**
+       * Detects if the current browser is Opera Mobile
+       */
+      isOperaMobile : check( function() {
+        return has( 'opera' ) && has( 'mobi' );
+      } ),
+
+      /**
+       * Detects if the current browser is Opera Mini
+       */
+      isOperaMini : check( function() {
+        return has( 'opera' ) && has( 'mini' );
+      } ),
+
+
+      /**
+       * isBlackberry10() can be used to check the User Agent for a BlackBerry 10 device.
+       */
+      isBlackberry10 : check( function() {
+        return has( 'bb10' ) && has( 'mobile' );
+      } ),
+
+      /**
+       * isBlackberryTablet() can be used to check the User Agent for a RIM blackberry tablet
+       */
+      isBlackberryTablet : check( function() {
+        return has( 'playbook' ) && has( 'rim tablet' );
+      } ),
+
+      /**
+       * Detects if the current browser is a Windows Phone 7 device.
+       */
+      isWindowsPhone7 : check( function () {
+        return has( 'windows phone os 7' );
+      } ),
+
+      /**
+       * Detects if the current browser is a Windows Phone 8 device.
+       */
+      isWindowsPhone8 : check( function () {
+        return has( 'windows phone 8' );
+      } ),
+
+      /**
+       * Detects if the device platform is J2ME.
+       */
+      isJ2MEPlatform : check( function () {
+        return has( 'j2me/midp' ) || ( has( 'midp' ) && has( 'cldc' ) );
+      } ),
+
+
+      /**
+       * Detects if the device platform is the Symbian Series 40.
+       */
+      isSymbianS40Platform : check( function() {
+        if ( has( 'series40' ) ) {
+          return has( 'nokia' ) || has( 'ovibrowser' ) || has( 'nokiabrowser' );
+        }
+      } ),
+
+
+      /**
+       * Detects if the device platform is the Symbian Series 60.
+       */
+      isSymbianPlatform : check( function() {
+        if ( has( 'webkit' ) ) {
+          // First, test for WebKit, then make sure it's either Symbian or S60.
+          return has( 'symbian' ) || has( 'series60' );
+        } else if ( has( 'symbianos' ) && has( 'series60' ) ) {
+          return true;
+        } else if ( has( 'nokia' ) && has( 'series60' ) ) {
+          return true;
+        } else if ( has( 'opera mini' ) ) {
+          return has( 'symbianos' ) || has( 'symbos' ) || has( 'series 60' );
+        }
+      } ),
+
+
+      /**
+       * Detects if the current browser is the Kindle Fire Native browser.
+       */
+      isKindleFire : check( function() {
+        return has( 'silk/' ) && has( 'silk-accelerated=' );
+      } ),
+
+      /**
+       * Detects if the current browser is Firefox Mobile (Fennec)
+       */
+      isFirefoxMobile : check( function() {
+        return has( 'fennec' );
+      } ),
+
+
+      /**
+       * Detects if the current browser is the native FirefoxOS browser
+       */
+      isFirefoxOS : check( function() {
+        return has( 'mozilla' ) && has( 'mobile' ) && has( 'gecko' ) && has( 'firefox' );
+      } ),
+
+
+      /**
+       * Detects if the current UA is Facebook for iPad
+       */
+      isFacebookForIpad : check( function() {
+        if ( ! has( 'ipad' ) )
+          return false;
+
+        return has( 'facebook' ) || has( 'fbforiphone' ) || has( 'fban/fbios;' );
+      } ),
+
+      /**
+       * Detects if the current UA is Facebook for iPhone
+       */
+      isFacebookForIphone : check( function() {
+        if ( ! has( 'iphone' ) )
+          return false;
+
+        return ( has( 'facebook' ) && ! has( 'ipad' ) ) ||
+          ( has( 'fbforiphone' ) && ! has( 'tablet' ) ) ||
+          ( has( 'fban/fbios;' ) && ! has( 'tablet' ) ); // FB app v5.0 or higher
+      } ),
+
+      /**
+       * Detects if the current UA is Twitter for iPhone
+       */
+      isTwitterForIphone : check( function() {
+        if ( has( 'ipad' ) )
+          return false;
+
+        return has( 'twitter for iphone' );
+      } ),
+
+      /**
+       * Detects if the current UA is Twitter for iPad
+       */
+      isTwitterForIpad : check( function() {
+        return has( 'twitter for ipad' ) || ( has( 'ipad' ) && has( 'twitter for iphone' ) );
+      } ),
+
+
+      /**
+       * Detects if the current UA is WordPress for iOS
+       */
+      isWordPressForIos : check( function() {
+        return has( 'wp-iphone' );
+      } )
+  };
+
+  function has( str ) {
+    return t.userAgent.indexOf( str ) != -1;
+  }
+
+  function check( fn ) {
+    return function() {
+      return t.userAgent === false ? false : fn() || false;
+    }
+  }
+
+  g.wpcom_mobile_user_agent_info = t;
+
+} )( typeof window !== 'undefined' ? window : this );
+;
+/*! This file is auto-generated */
+!function(e,t){if("function"==typeof define&&define.amd)define("hoverintent",["module"],t);else if("undefined"!=typeof exports)t(module);else{var n={exports:{}};t(n),e.hoverintent=n.exports}}(this,function(e){"use strict";var t=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var o in n)Object.prototype.hasOwnProperty.call(n,o)&&(e[o]=n[o])}return e};e.exports=function(e,n,o){function i(e,t){return y&&(y=clearTimeout(y)),b=0,p?void 0:o.call(e,t)}function r(e){m=e.clientX,d=e.clientY}function u(e,t){if(y&&(y=clearTimeout(y)),Math.abs(h-m)+Math.abs(E-d)<x.sensitivity)return b=1,p?void 0:n.call(e,t);h=m,E=d,y=setTimeout(function(){u(e,t)},x.interval)}function s(t){return L=!0,y&&(y=clearTimeout(y)),e.removeEventListener("mousemove",r,!1),1!==b&&(h=t.clientX,E=t.clientY,e.addEventListener("mousemove",r,!1),y=setTimeout(function(){u(e,t)},x.interval)),this}function c(t){return L=!1,y&&(y=clearTimeout(y)),e.removeEventListener("mousemove",r,!1),1===b&&(y=setTimeout(function(){i(e,t)},x.timeout)),this}function v(t){L||(p=!0,n.call(e,t))}function a(t){!L&&p&&(p=!1,o.call(e,t))}function f(){e.addEventListener("focus",v,!1),e.addEventListener("blur",a,!1)}function l(){e.removeEventListener("focus",v,!1),e.removeEventListener("blur",a,!1)}var m,d,h,E,L=!1,p=!1,T={},b=0,y=0,x={sensitivity:7,interval:100,timeout:0,handleFocus:!1};return T.options=function(e){var n=e.handleFocus!==x.handleFocus;return x=t({},x,e),n&&(x.handleFocus?f():l()),T},T.remove=function(){e&&(e.removeEventListener("mouseover",s,!1),e.removeEventListener("mouseout",c,!1),l())},e&&(e.addEventListener("mouseover",s,!1),e.addEventListener("mouseout",c,!1)),T}});
+;
+/*! This file is auto-generated */
+!function(c,l,u){function d(e){27===e.which&&(e=E(e.target,".menupop"))&&(e.querySelector(".menupop > .ab-item").focus(),y(e,"hover"))}function p(e){var t;13!==e.which||e.ctrlKey||e.shiftKey||E(e.target,".ab-sub-wrapper")||(t=E(e.target,".menupop"))&&(e.preventDefault(),(a(t,"hover")?y:v)(t,"hover"))}function m(e,t){!E(t.target,".ab-sub-wrapper")&&(t.preventDefault(),t=E(t.target,".menupop"))&&(a(t,"hover")?y:(b(e),v))(t,"hover")}function f(e){var t,r=e.target.parentNode;if(t=r?r.querySelector(".shortlink-input"):t)return e.preventDefault&&e.preventDefault(),e.returnValue=!1,v(r,"selected"),t.focus(),t.select(),!(t.onblur=function(){y(r,"selected")})}function h(){if("sessionStorage"in l)try{for(var e in sessionStorage)-1<e.indexOf("wp-autosave-")&&sessionStorage.removeItem(e)}catch(e){}}function a(e,t){return e&&(e.classList&&e.classList.contains?e.classList.contains(t):e.className&&-1<e.className.split(" ").indexOf(t))}function v(e,t){e&&(e.classList&&e.classList.add?e.classList.add(t):a(e,t)||(e.className&&(e.className+=" "),e.className+=t),e=e.querySelector("a"),"hover"===t)&&e&&e.hasAttribute("aria-expanded")&&e.setAttribute("aria-expanded","true")}function y(e,t){var r,n;if(e&&a(e,t)){if(e.classList&&e.classList.remove)e.classList.remove(t);else{for(r=" "+t+" ",n=" "+e.className+" ";-1<n.indexOf(r);)n=n.replace(r,"");e.className=n.replace(/^[\s]+|[\s]+$/g,"")}e=e.querySelector("a");"hover"===t&&e&&e.hasAttribute("aria-expanded")&&e.setAttribute("aria-expanded","false")}}function b(e){if(e&&e.length)for(var t=0;t<e.length;t++)y(e[t],"hover")}function g(e){if(!e.target||"wpadminbar"===e.target.id||"wp-admin-bar-top-secondary"===e.target.id)try{l.scrollTo({top:-32,left:0,behavior:"smooth"})}catch(e){l.scrollTo(0,-32)}}function E(e,t){for(l.Element.prototype.matches||(l.Element.prototype.matches=l.Element.prototype.matchesSelector||l.Element.prototype.mozMatchesSelector||l.Element.prototype.msMatchesSelector||l.Element.prototype.oMatchesSelector||l.Element.prototype.webkitMatchesSelector||function(e){for(var t=(this.document||this.ownerDocument).querySelectorAll(e),r=t.length;0<=--r&&t.item(r)!==this;);return-1<r});e&&e!==c;e=e.parentNode)if(e.matches(t))return e;return null}c.addEventListener("DOMContentLoaded",function(){var r,e,t,n,a,o,s,i=c.getElementById("wpadminbar");if(i&&"querySelectorAll"in i){r=i.querySelectorAll("li.menupop"),e=i.querySelectorAll(".ab-item"),t=c.querySelector("#wp-admin-bar-logout a"),n=c.getElementById("adminbarsearch"),a=c.getElementById("wp-admin-bar-get-shortlink"),i.querySelector(".screen-reader-shortcut"),o=/Mobile\/.+Safari/.test(u.userAgent)?"touchstart":"click",y(i,"nojs"),"ontouchstart"in l&&(c.body.addEventListener(o,function(e){E(e.target,"li.menupop")||b(r)}),i.addEventListener("touchstart",function e(){for(var t=0;t<r.length;t++)r[t].addEventListener("click",m.bind(null,r));i.removeEventListener("touchstart",e)})),i.addEventListener("click",g);for(s=0;s<r.length;s++)l.hoverintent(r[s],v.bind(null,r[s],"hover"),y.bind(null,r[s],"hover")).options({timeout:180}),r[s].addEventListener("keydown",p);for(s=0;s<e.length;s++)e[s].addEventListener("keydown",d);n&&((o=c.getElementById("adminbar-search")).addEventListener("focus",function(){v(n,"adminbar-focused")}),o.addEventListener("blur",function(){y(n,"adminbar-focused")})),a&&a.addEventListener("click",f),l.location.hash&&l.scrollBy(0,-32),t&&t.addEventListener("click",h)}})}(document,window,navigator);;
+(()=>{var t={2962:()=>{window.jetpackForms=window.jetpackForms||{},window.jetpackForms.getBackgroundColor=function(t){let o=window.getComputedStyle(t).backgroundColor;for(;"rgba(0, 0, 0, 0)"===o&&t.parentNode&&t.parentNode.nodeType===window.Node.ELEMENT_NODE;)if("wp-block-cover"!==(t=t.parentNode).className)o=window.getComputedStyle(t).backgroundColor;else{const e=t.querySelector(".wp-block-cover__background");o=window.getComputedStyle(e).backgroundColor}return o},window.jetpackForms.generateStyleVariables=function(t){if(!t)return;const o=window["editor-canvas"]?window["editor-canvas"].document:document,e=o.querySelector("body"),r=o.createElement("div");r.className="contact-form__style-probe",r.style="position: absolute; z-index: -1; width: 1px; height: 1px; visibility: hidden",r.innerHTML='\n\t\t\t<div class="contact-form">\n\t\t\t\t<div class="wp-block-button">\n\t\t\t\t\t<div class="wp-block-button__link btn-primary">Test</div>\n\t\t\t\t</div>\n\t\t\t\t<div class="wp-block-button is-style-outline">\n\t\t\t\t\t<div class="wp-block-button__link btn-outline">Test</div>\n\t\t\t\t</div>\n\t\t\t\t<div class="jetpack-field">\n\t\t\t\t\t<input class="jetpack-field__input" type="text">\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t',t.parentNode.appendChild(r);const n=r.querySelector(".btn-primary"),c=r.querySelector(".btn-outline"),a=r.querySelector('input[type="text"]'),d=window.jetpackForms.getBackgroundColor(e),i=window.jetpackForms.getBackgroundColor(a),l=window.getComputedStyle(a).backgroundColor,{border:p,borderColor:u,backgroundColor:b,color:s}=window.getComputedStyle(n),{backgroundColor:k,border:m,borderWidth:f,borderRadius:w,color:g,padding:j,lineHeight:y}=window.getComputedStyle(c),v=window.jetpackForms.getBackgroundColor(c),{color:C,padding:S,paddingTop:h,paddingLeft:_,border:x,borderColor:F,borderWidth:N,borderStyle:T,borderRadius:q,fontSize:E,fontFamily:z,lineHeight:B}=window.getComputedStyle(a);return r.remove(),{"--jetpack--contact-form--primary-color":b,"--jetpack--contact-form--background-color":d,"--jetpack--contact-form--text-color":C,"--jetpack--contact-form--border":x,"--jetpack--contact-form--border-color":F,"--jetpack--contact-form--border-size":N,"--jetpack--contact-form--border-style":T,"--jetpack--contact-form--border-radius":q,"--jetpack--contact-form--input-background":l,"--jetpack--contact-form--input-background-fallback":i,"--jetpack--contact-form--input-padding":S,"--jetpack--contact-form--input-padding-top":h,"--jetpack--contact-form--input-padding-left":_,"--jetpack--contact-form--font-size":E,"--jetpack--contact-form--font-family":z,"--jetpack--contact-form--line-height":B,"--jetpack--contact-form--button-primary--color":s,"--jetpack--contact-form--button-primary--background-color":b,"--jetpack--contact-form--button-primary--border":p,"--jetpack--contact-form--button-primary--border-color":u,"--jetpack--contact-form--button-outline--padding":j,"--jetpack--contact-form--button-outline--border":m,"--jetpack--contact-form--button-outline--background-color":k,"--jetpack--contact-form--button-outline--background-color-fallback":v,"--jetpack--contact-form--button-outline--border-size":f,"--jetpack--contact-form--button-outline--border-radius":w,"--jetpack--contact-form--button-outline--text-color":g,"--jetpack--contact-form--button-outline--line-height":y}}}},o={};function e(r){var n=o[r];if(void 0!==n)return n.exports;var c=o[r]={exports:{}};return t[r](c,c.exports,e),c.exports}e.n=t=>{var o=t&&t.__esModule?()=>t.default:()=>t;return e.d(o,{a:o}),o},e.d=(t,o)=>{for(var r in o)e.o(o,r)&&!e.o(t,r)&&Object.defineProperty(t,r,{enumerable:!0,get:o[r]})},e.o=(t,o)=>Object.prototype.hasOwnProperty.call(t,o),(()=>{"use strict";e(2962);const{generateStyleVariables:t}=window.jetpackForms,o=setTimeout((()=>{r()}),3e3);function r(){const o=document.querySelectorAll(".wp-block-jetpack-contact-form-container");for(const e of o){const o=t(e);if(!o)return;for(const t in o)e.style.setProperty(t,o[t])}}window.addEventListener("load",(()=>{clearTimeout(o),r()}))})()})();;
